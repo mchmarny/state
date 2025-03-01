@@ -34,11 +34,11 @@ jobs:
         go-version: '${{ inputs.go_version }}'
     - run: go version
     - name: Cache Go Modules
-      uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2  # v4.0.0
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
       with:
         path: |
-          ~/go/pkg/mod
           ~/.cache/go-build
+          ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
@@ -66,11 +66,11 @@ jobs:
         go-version: '${{ inputs.go_version }}'
     - run: go version
     - name: Cache Go Modules
-      uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2  # v4.0.0
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
       with:
         path: |
-          ~/go/pkg/mod
           ~/.cache/go-build
+          ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
