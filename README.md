@@ -1,3 +1,3 @@
 # state
 
-Local state persistence made easy
+WIP: Simple local state persistence
