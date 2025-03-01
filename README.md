@@ -1,5 +1,4 @@
-[![](https://github.com/mchmarny/state/actions/workflows/on-push.yaml/badge.svg?branch=main)](https://github.com/mchmarny/state/actions/workflows/on-push.yaml)
-[![](https://github.com/mchmarny/state/actions/workflows/on-tag.yaml/badge.svg)](https://github.com/mchmarny/state/actions/workflows/on-tag.yaml)
+[![](https://github.com/mchmarny/state/actions/workflows/on-push.yaml/badge.svg?branch=main)](https://github.com/mchmarny/state/actions/workflows/qualify.yaml)
 [![](https://codecov.io/gh/mchmarny/state/branch/main/graph/badge.svg?token=9HLYDZZADN)](https://codecov.io/gh/mchmarny/state)
 [![version](https://img.shields.io/github/release/mchmarny/state.svg?label=version)](https://github.com/mchmarny/state/releases/latest)
 [![](https://img.shields.io/github/go-mod/go-version/mchmarny/state.svg?label=go)](https://github.com/mchmarny/state)
