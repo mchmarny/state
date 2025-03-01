@@ -20,7 +20,7 @@ upgrade: ## Upgrades all dependencies
 
 .PHONY: test
 test: tidy ## Runs unit tests
-	go test -count=1 -race -covermode=atomic -coverprofile=cover.out ./manager/...
+	go test -count=1 -race -covermode=atomic -coverprofile=coverage.txt ./manager/...
 
 .PHONY: lint
 lint: lint-go lint-yaml ## Lints the entire project using go and yamllint
@@ -42,7 +42,7 @@ qualify: lint vulncheck  ## Runs all quality checks
 
 .PHONY: tag
 tag: ## Creates release tag 
-	git tag -s -m "version bump to $(VERSION)" $(VERSION)
+	git tag -s -m "release $(VERSION)" $(VERSION)
 	git push origin $(VERSION)
 
 .PHONY: clean
