@@ -115,7 +115,7 @@ func (s *StateManager) Save(data interface{}) error {
 
 	// Write to a temporary file first
 	tempFile := s.FilePath + ".tmp"
-	if err := os.WriteFile(tempFile, b, 0644); err != nil {
+	if err := os.WriteFile(tempFile, b, 0600); err != nil {
 		return fmt.Errorf("failed to write to temp file: %w", err)
 	}
 
