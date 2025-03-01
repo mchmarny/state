@@ -1,0 +1,37 @@
+run:
+  timeout: 5m
+
+linters:
+  disable-all: true
+  enable:
+  - asciicheck
+  - errcheck
+  - errorlint
+  - goconst
+  - gocyclo
+  - gofmt
+  - goimports
+  - gosec
+  - govet
+  - importas
+  - ineffassign
+  - misspell
+  - prealloc
+  - revive
+  - staticcheck
+  - stylecheck
+  - tparallel
+  - typecheck
+  - unconvert
+  - unparam
+  - unused
+  - whitespace
+
+output:
+  sort-results: true
+  sort-order:
+  - linter
+  - file
+  show-stats: true
+  print-issued-lines: true
+  print-linter-name: true
