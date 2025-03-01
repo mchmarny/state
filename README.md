@@ -7,4 +7,18 @@
 
 # state
 
-WIP: Simple local state persistence
+Simple local state persistence of Go structs. 
+
+Support: 
+* Configurable serialization (JSON, YAML, Binary)
+* Custom opt-in persistence annotation (`state`) 
+* Thread safe
+
+## usage example
+
+* [simple](examples/simple/main.go)
+* [annotations](examples/annotations/main.go)
+
+## disclaimer
+
+This is my personal project and it does not represent my employer. While I do my best to ensure that everything works, I take no responsibility for issues caused by this code.
