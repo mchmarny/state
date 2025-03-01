@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
+      
     steps:
     - name: Checkout Code
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v3.4.0
@@ -45,8 +46,9 @@ jobs:
         make test
     - name: Parse Coverage
       uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574  # v5.4.0
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: true
         files: ./coverage.txt
         flags: unittests
