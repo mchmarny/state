@@ -1,4 +1,4 @@
-VERSION    :="v0.1.2"
+VERSION    :="v0.1.3"
 YAML_FILES :=$(shell find . ! -path "./vendor/*" -type f -regex ".*y*ml" -print)
 
 all: help
