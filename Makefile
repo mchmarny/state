@@ -14,7 +14,7 @@ tidy: ## Updates the go modules and vendors all dependencies
 
 .PHONY: upgrade
 upgrade: ## Upgrades all dependencies 
-	go get -d -u ./...
+	go get -u ./...
 	go mod tidy
 	go mod vendor
 
@@ -36,6 +36,9 @@ lint-yaml: ## Runs yamllint on all yaml files (brew install yamllint)
 .PHONY: vulncheck
 vulncheck: ## Checks for soource vulnerabilities
 	govulncheck -test ./...
+
+.PHONY: qualify
+qualify: lint vulncheck  ## Runs all quality checks
 
 .PHONY: tag
 tag: ## Creates release tag 
