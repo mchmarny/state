@@ -113,10 +113,15 @@ func (s *StateManager) Save(data interface{}) error {
 		return fmt.Errorf("no data was encoded")
 	}
 
-	// Write to file
-	_, err = file.Write(b)
-	if err != nil {
-		return fmt.Errorf("failed to write to file: %w", err)
+	// Write to a temporary file first
+	tempFile := s.FilePath + ".tmp"
+	if err := os.WriteFile(tempFile, b, 0644); err != nil {
+		return fmt.Errorf("failed to write to temp file: %w", err)
+	}
+
+	// Atomically move temp file to actual file
+	if err := os.Rename(tempFile, s.FilePath); err != nil {
+		return fmt.Errorf("failed to rename temp file: %w", err)
 	}
 
 	return nil
@@ -186,7 +191,6 @@ func stateMarshal(data interface{}) ([]byte, error) {
 	return yaml.Marshal(values)
 }
 
-// Unmarshal handles struct deserialization using field tags
 func stateUnmarshal(data []byte, v interface{}) error {
 	if reflect.TypeOf(v).Kind() != reflect.Ptr {
 		return fmt.Errorf("unmarshal target must be a pointer to a struct")
@@ -194,7 +198,7 @@ func stateUnmarshal(data []byte, v interface{}) error {
 
 	values := make(map[string]interface{})
 	if err := yaml.Unmarshal(data, &values); err != nil {
-		return err
+		return fmt.Errorf("failed to unmarshal YAML: %w", err)
 	}
 
 	vt := reflect.TypeOf(v).Elem()
@@ -207,63 +211,56 @@ func stateUnmarshal(data []byte, v interface{}) error {
 			key = strings.ToLower(field.Name)
 		}
 
-		if value, ok := values[key]; ok {
-			fieldValue := vv.Field(i)
-			if !fieldValue.CanSet() {
-				continue
-			}
+		value, ok := values[key]
+		if !ok {
+			continue
+		}
 
-			switch fieldValue.Kind() {
-			case reflect.String:
-				if str, ok := value.(string); ok {
-					fieldValue.SetString(str)
-				}
-			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-				switch v := value.(type) {
-				case int:
-					fieldValue.SetInt(int64(v))
-				case int64:
-					fieldValue.SetInt(v)
-				case float64: // YAML may decode numbers as float64
-					fieldValue.SetInt(int64(v))
-				case string:
-					if num, err := strconv.ParseInt(v, 10, 64); err == nil {
-						fieldValue.SetInt(num)
-					}
-				}
-			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-				switch v := value.(type) {
-				case uint:
-					fieldValue.SetUint(uint64(v))
-				case uint64:
-					fieldValue.SetUint(v)
-				case float64: // YAML may decode numbers as float64
-					fieldValue.SetUint(uint64(v))
-				case string:
-					if num, err := strconv.ParseUint(v, 10, 64); err == nil {
-						fieldValue.SetUint(num)
-					}
-				}
-			case reflect.Float32, reflect.Float64:
-				if num, ok := value.(float64); ok {
-					fieldValue.SetFloat(num)
-				} else if str, ok := value.(string); ok {
-					if num, err := strconv.ParseFloat(str, 64); err == nil {
-						fieldValue.SetFloat(num)
-					}
-				}
-			case reflect.Bool:
-				if boolean, ok := value.(bool); ok {
-					fieldValue.SetBool(boolean)
-				} else if str, ok := value.(string); ok {
-					if boolean, err := strconv.ParseBool(str); err == nil {
-						fieldValue.SetBool(boolean)
-					}
-				}
+		fieldValue := vv.Field(i)
+		if !fieldValue.CanSet() {
+			continue
+		}
+
+		// Handle pointer fields
+		if fieldValue.Kind() == reflect.Ptr {
+			elemType := fieldValue.Type().Elem()
+			newVal := reflect.New(elemType)
+			if err := setReflectValue(newVal.Elem(), value); err == nil {
+				fieldValue.Set(newVal)
 			}
+		} else {
+			_ = setReflectValue(fieldValue, value)
 		}
 	}
 
+	return nil
+}
+
+func setReflectValue(field reflect.Value, value interface{}) error {
+	switch field.Kind() {
+	case reflect.String:
+		if str, ok := value.(string); ok {
+			field.SetString(str)
+		}
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", value), 10, 64); err == nil {
+			field.SetInt(num)
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		if num, err := strconv.ParseUint(fmt.Sprintf("%v", value), 10, 64); err == nil {
+			field.SetUint(num)
+		}
+	case reflect.Float32, reflect.Float64:
+		if num, err := strconv.ParseFloat(fmt.Sprintf("%v", value), 64); err == nil {
+			field.SetFloat(num)
+		}
+	case reflect.Bool:
+		if boolean, err := strconv.ParseBool(fmt.Sprintf("%v", value)); err == nil {
+			field.SetBool(boolean)
+		}
+	default:
+		return fmt.Errorf("unsupported field type: %s", field.Kind())
+	}
 	return nil
 }
 
