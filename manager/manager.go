@@ -59,6 +59,15 @@ func WithFilePath(filePath string) StateOption {
 	}
 }
 
+// WithStateKey sets a custom key for the State
+func WithStateKey(key string) StateOption {
+	return func(s *StateManager) {
+		if key != "" {
+			s.FilePath = fmt.Sprintf("%s-%s", s.FilePath, key)
+		}
+	}
+}
+
 // NewStateManager initializes a new State with functional options.
 func NewStateManager(options ...StateOption) (*StateManager, error) {
 	homeDir, err := os.UserHomeDir()

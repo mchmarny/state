@@ -32,6 +32,34 @@ func setupTempStateManager(t *testing.T, serializationType SerializationType) *S
 	return sm
 }
 
+func TestSaveAndLoadWithKey(t *testing.T) {
+	sm1, err := NewStateManager(
+		WithStateKey("test1"),
+		WithSerializationType(YAML),
+	)
+	assert.NoError(t, err)
+
+	sm2, err := NewStateManager(
+		WithStateKey("test2"),
+		WithSerializationType(YAML),
+	)
+	assert.NoError(t, err)
+
+	data1 := &TestStruct{"Bob", 40, 36.5, false}
+	data2 := &TestStruct{"Ann", 40, 36.5, true}
+
+	assert.NoError(t, sm1.Save(data1))
+	assert.NoError(t, sm2.Save(data2))
+
+	load1 := &TestStruct{}
+	assert.NoError(t, sm1.Load(load1))
+	assert.Equal(t, data1, load1)
+
+	load2 := &TestStruct{}
+	assert.NoError(t, sm2.Load(load2))
+	assert.Equal(t, data2, load2)
+}
+
 // TestSaveAndLoadJSON ensures JSON serialization and deserialization works correctly.
 func TestSaveAndLoadJSON(t *testing.T) {
 	sm := setupTempStateManager(t, JSON)
